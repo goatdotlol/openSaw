@@ -1,55 +1,75 @@
-# Open Saw
+<div align="center">
 
-<p align="center">
-  <strong>🌲 A professional, memory-safe, and incredibly fast local coding agent CLI, carefully crafted by fivesaw. 🌲</strong>
-</p>
+# 🌲 Open Saw 🌲
 
-## Overview
+**The ultimate local coding agent built for developers who demand speed, aesthetics, and privacy.** 
 
-Open Saw is an open-source alternative for your AI development needs, providing a beautiful "green forest" themed terminal interface and lightning-fast local execution directly in your Rust and Python workspaces. Open Saw provides a robust and gorgeous workflow to generate code, run prompt files, and coordinate complex tasks from the command line, all while retaining full backward compatibility with any of your standard LLM API keys. 
+[![Build Status](https://img.shields.io/github/actions/workflow/status/goatdotlol/claw-code-windows/build-windows.yml?branch=main&style=for-the-badge&color=2ea44f)](https://github.com/goatdotlol/claw-code-windows/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-success.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Rust](https://img.shields.io/badge/Language-Rust_⚡-orange.svg?style=for-the-badge)](https://www.rust-lang.org/)
 
-## Features
-- **Extremely Fast Execution**: Written entirely in secure Rust.
-- **Agentic Automation**: Let the AI automatically coordinate complex coding flows across multiple files.
-- **Beautiful Interface**: Minimalistic "green forest" style with an immersive developer experience.
-- **Open Configuration**: Easily bring your own API keys. Supports a variety of standard configurations. 
+<br />
+<br />
 
-## Getting Started
+</div>
 
-### Using the Pre-built Windows App (EXE)
+## ✨ What is Open Saw?
 
-To start using Open Saw immediately without installing code tools yourself:
+Open Saw is a high-performance, command-line AI coding assistant engineered for the sheer love of speed and design. It operates beautifully as an interactive local service that directly manipulates, coordinates, and resolves coding workflows directly inside your workspace without compromising your local API integrations. 
 
-1. Look in the **Releases** section on the right side of this repository.
-2. Download the latest `saw.exe`.
-3. Open a Command Prompt or PowerShell window in the folder where you downloaded `saw.exe`.
-4. Run:
-   ```cmd
-   saw.exe
-   ```
-5. Follow the interactive instructions to set up your chosen API key! Or type `saw.exe --help` to see all available flags and options.
+Crafted with a signature "Green Forest" aesthetic, **Open Saw by fivesaw** abandons cluttered UI logic in favor of a sleek, extremely fast terminal native experience.
 
-### Building from Source
+---
 
-If you prefer to compile it yourself:
+## 🚀 Features
 
-1. Make sure you have the latest Rust toolchain installed.
-2. Clone the repository and navigate to the `rust/` directory.
-3. Build the release binary:
-   ```bash
-   cd rust
-   cargo build --release
-   ```
-4. Find the executable at `target/release/saw`.
+| Feature | Description |
+| ------- | ----------- |
+| ⚡ **Insanely Fast** | Rewritten natively in secure Rust, meaning ZERO cold starts and instantaneous local performance. |
+| 🤖 **Agentic Autonomy** | Can automatically traverse a massive repository to generate, refactor, and commit code safely. |
+| 🌲 **Beautiful Design** | Features an immersive, distraction-free "Green Forest" UI with dynamic terminal micro-animations. |
+| 🔌 **Bring Your Own Keys** | Deeply independent code base allows you to hook up any standard LLM provider without friction. |
 
-## Commands Reference
+---
 
-The command palette is fully interactive. Once in the REPL, type `/help` for an extended guide.
+## 🛠️ Usage & Installation
 
-- `saw` - Starts the interactive REPL coding session.
-- `saw "Summarize this repo"` - Runs a single explicit shot to prompt.
-- `saw --version` - Print out your current binary version block.
+You don't need any complex development environments or dependency managers to use Open Saw — we've bundled it all up for you.
 
-## License
+### 1. Download The Application
+1. Head over to the **[Releases](../../releases/latest)** tab on the right sidebar of this GitHub page.
+2. Download the `OpenSaw-Setup.exe` file.
+3. Run the installer to unpack the tool and automatically place Open Saw on your Desktop.
 
-MIT License. Do your best and build the future with Open Saw!
+### 2. Launch It
+No clunky terminal commands needed to start! Simply click your new **Open Saw Desktop Shortcut** (or hit Windows Key and type "Open Saw"). Open Saw seamlessly binds into the terminal natively and loads up instantly.
+
+
+---
+
+## 📖 Command Reference
+
+Open Saw provides a brilliant slash-command system integrated into the REPL (Read-Eval-Print Loop). Just start the application and experiment!
+
+- **`/help`**           — Browse the full command registry.
+- **`/status`**         — Inspect session & workspace health.
+- **`/model <name>`**   — Swap out the active intelligence model mid-session.
+- **`/permissions`**    — Change the exact read/write clearance boundaries in your workspace.
+
+*Note: You can skip straight into tasks directly like this:*
+```bash
+saw prompt "Refactor the file_ops.rs module to add better error handling"
+```
+
+---
+
+## 🌿 The Story Behind Open Saw
+
+I (`fivesaw`) wanted an AI agent experience that felt less like a clunky SaaS application and more like a beautifully crafted tool that belonged directly on your machine. I took the raw concepts from previous powerful open-source agents, threw out the confusing configurations, hardened it in Rust, and applied a deeply focused aesthetic. 
+
+The goal was simple: make it hit hard, make it lightweight, and make it look fantastic. 
+
+<div align="center">
+  <br />
+  <i>Made with a passion for excellent tooling | Open Saw</i>
+</div>
