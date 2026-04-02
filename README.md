@@ -1,75 +1,89 @@
 <div align="center">
 
-# 🌲 Open Saw 🌲
+# OPEN SAW
 
-**The ultimate local coding agent built for developers who demand speed, aesthetics, and privacy.** 
+**Advanced Local Agent Protocol** <br/>
+*A deterministic, high-octane local coding agent optimized for speed and autonomy.*
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/goatdotlol/claw-code-windows/build-windows.yml?branch=main&style=for-the-badge&color=2ea44f)](https://github.com/goatdotlol/claw-code-windows/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-success.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Rust](https://img.shields.io/badge/Language-Rust_⚡-orange.svg?style=for-the-badge)](https://www.rust-lang.org/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/goatdotlol/claw-code-windows/build-windows.yml?branch=main&style=for-the-badge&color=1e293b)](https://github.com/goatdotlol/claw-code-windows/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-1e293b.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Rust](https://img.shields.io/badge/Language-Rust-1e293b.svg?style=for-the-badge)](https://www.rust-lang.org/)
 
 <br />
-<br />
+
+> Architecture engineered for extreme performance. No forced UI layers. No external dependencies. Strict local operations.
+> *Authored by fivesaw.*
 
 </div>
 
-## ✨ What is Open Saw?
+<br/>
 
-Open Saw is a high-performance, command-line AI coding assistant engineered for the sheer love of speed and design. It operates beautifully as an interactive local service that directly manipulates, coordinates, and resolves coding workflows directly inside your workspace without compromising your local API integrations. 
+## / Overview
 
-Crafted with a signature "Green Forest" aesthetic, **Open Saw by fivesaw** abandons cluttered UI logic in favor of a sleek, extremely fast terminal native experience.
+Open Saw is an advanced command-line coding intelligence system. It embeds deeply into the developer workflow, providing high-fidelity code modifications directly inside the source tree. 
 
----
+By eliminating bloated web wrappers, Open Saw accelerates inference output and executes file operations through a robust memory-safe backend compiled purely in Rust. It utilizes a strict forest-inspired terminal scheme that reduces visual fatigue whilst retaining maximum data readability.
 
-## 🚀 Features
+<br/>
 
-| Feature | Description |
-| ------- | ----------- |
-| ⚡ **Insanely Fast** | Rewritten natively in secure Rust, meaning ZERO cold starts and instantaneous local performance. |
-| 🤖 **Agentic Autonomy** | Can automatically traverse a massive repository to generate, refactor, and commit code safely. |
-| 🌲 **Beautiful Design** | Features an immersive, distraction-free "Green Forest" UI with dynamic terminal micro-animations. |
-| 🔌 **Bring Your Own Keys** | Deeply independent code base allows you to hook up any standard LLM provider without friction. |
+## / Capabilities
 
----
+| **Module**              | **Specification**                                                                                 |
+| :---------------------- | :------------------------------------------------------------------------------------------------ |
+| + **Compiled Security** | Developed entirely in Rust. Memory-safe. Predictable runtime execution.                           |
+| + **Autonomous Target** | Automated repository traversal, file context aggregation, and dynamic commit generation.          |
+| + **CLI Integration**   | Terminal-native architecture. Operates seamlessly parallel to your standard shell commands.       |
+| + **Provider Agnostic** | Unrestricted internal payload structuring. Supply an API key; open the connection. Complete access.|
 
-## 🛠️ Usage & Installation
+<br/>
 
-You don't need any complex development environments or dependency managers to use Open Saw — we've bundled it all up for you.
+## / Deployment
 
-### 1. Download The Application
-1. Head over to the **[Releases](../../releases/latest)** tab on the right sidebar of this GitHub page.
-2. Download the `OpenSaw-Setup.exe` file.
-3. Run the installer to unpack the tool and automatically place Open Saw on your Desktop.
+Open Saw distributes as a standalone, zero-dependency executable engineered for Microsoft Windows.
 
-### 2. Launch It
-No clunky terminal commands needed to start! Simply click your new **Open Saw Desktop Shortcut** (or hit Windows Key and type "Open Saw"). Open Saw seamlessly binds into the terminal natively and loads up instantly.
+### Standard Installation
 
+1. Navigate to the **[Releases](../../releases/latest)** module on this repository.
+2. Store `OpenSaw-Setup.exe` onto your local disk.
+3. Execute the setup package.
+4. The deployment engine will automatically provision global system `$PATH` variables and compile minimal desktop routing shortcuts.
 
----
+### Operation
 
-## 📖 Command Reference
+Engage the environment by pressing the generated Desktop icon or executing the primary directive from any command terminal:
 
-Open Saw provides a brilliant slash-command system integrated into the REPL (Read-Eval-Print Loop). Just start the application and experiment!
+```cmd
+saw
+```
 
-- **`/help`**           — Browse the full command registry.
-- **`/status`**         — Inspect session & workspace health.
-- **`/model <name>`**   — Swap out the active intelligence model mid-session.
-- **`/permissions`**    — Change the exact read/write clearance boundaries in your workspace.
+The system will intercept the invocation and spool up the interactive REPL instance.
 
-*Note: You can skip straight into tasks directly like this:*
+<br/>
+
+## / Command Palette
+
+Open Saw operates via a structured prompt protocol. Upon REPL initialization, the primary commands include:
+
+* **/help**         : Output comprehensive syntax schema.
+* **/status**       : Dump local diagnostic telemetry.
+* **/model [id]**   : Hotboard the inference hardware mid-execution.
+* **/permissions**  : Restrict or expand host filesystem access boundaries.
+
+To inject a singular prompt command without sustaining the REPL session:
+
 ```bash
 saw prompt "Refactor the file_ops.rs module to add better error handling"
 ```
 
----
+<br/>
 
-## 🌿 The Story Behind Open Saw
+## / Architecture & Vision
 
-I (`fivesaw`) wanted an AI agent experience that felt less like a clunky SaaS application and more like a beautifully crafted tool that belonged directly on your machine. I took the raw concepts from previous powerful open-source agents, threw out the confusing configurations, hardened it in Rust, and applied a deeply focused aesthetic. 
+Open Saw emerged from the necessity to construct an uncompromising, purely local agent environment. Complex IDE extensions and heavy SaaS bindings inherently restrict developer freedom. The objective of this protocol is strict alignment with the UNIX philosophy: do one thing, and do it optimally.
 
-The goal was simple: make it hit hard, make it lightweight, and make it look fantastic. 
+We decoupled the standard cloud restrictions, stripped graphical constraints, and developed an aggressive logic loop using Rust's async runtime. Open Saw delivers uncompromised execution scaling and total model agnosticism. 
 
 <div align="center">
   <br />
-  <i>Made with a passion for excellent tooling | Open Saw</i>
+  ~ <i>End of document</i> ~
 </div>
