@@ -213,8 +213,8 @@ fn discover_instruction_files(cwd: &Path) -> std::io::Result<Vec<ContextFile>> {
         for candidate in [
             dir.join("CLAW.md"),
             dir.join("CLAW.local.md"),
-            dir.join(".claw").join("CLAW.md"),
-            dir.join(".claw").join("instructions.md"),
+            dir.join(".saw").join("CLAW.md"),
+            dir.join(".saw").join("instructions.md"),
         ] {
             push_context_file(&mut files, candidate)?;
         }
@@ -292,7 +292,7 @@ fn render_project_context(project_context: &ProjectContext) -> String {
     ];
     if !project_context.instruction_files.is_empty() {
         bullets.push(format!(
-            "Claw instruction files discovered: {}.",
+            "Saw instruction files discovered: {}.",
             project_context.instruction_files.len()
         ));
     }
@@ -311,7 +311,7 @@ fn render_project_context(project_context: &ProjectContext) -> String {
 }
 
 fn render_instruction_files(files: &[ContextFile]) -> String {
-    let mut sections = vec!["# Claw instructions".to_string()];
+    let mut sections = vec!["# Saw instructions".to_string()];
     let mut remaining_chars = MAX_TOTAL_INSTRUCTION_CHARS;
     for file in files {
         if remaining_chars == 0 {
@@ -431,7 +431,7 @@ fn render_config_section(config: &RuntimeConfig) -> String {
     let mut lines = vec!["# Runtime config".to_string()];
     if config.loaded_entries().is_empty() {
         lines.extend(prepend_bullets(vec![
-            "No Claw Code settings files loaded.".to_string()
+            "No Open Saw settings files loaded.".to_string()
         ]));
         return lines.join("\n");
     }
@@ -527,23 +527,23 @@ mod tests {
     fn discovers_instruction_files_from_ancestor_chain() {
         let root = temp_dir();
         let nested = root.join("apps").join("api");
-        fs::create_dir_all(nested.join(".claw")).expect("nested claw dir");
+        fs::create_dir_all(nested.join(".saw")).expect("nested saw dir");
         fs::write(root.join("CLAW.md"), "root instructions").expect("write root instructions");
         fs::write(root.join("CLAW.local.md"), "local instructions")
             .expect("write local instructions");
         fs::create_dir_all(root.join("apps")).expect("apps dir");
-        fs::create_dir_all(root.join("apps").join(".claw")).expect("apps claw dir");
+        fs::create_dir_all(root.join("apps").join(".saw")).expect("apps saw dir");
         fs::write(root.join("apps").join("CLAW.md"), "apps instructions")
             .expect("write apps instructions");
         fs::write(
-            root.join("apps").join(".claw").join("instructions.md"),
-            "apps dot claw instructions",
+            root.join("apps").join(".saw").join("instructions.md"),
+            "apps dot saw instructions",
         )
-        .expect("write apps dot claw instructions");
-        fs::write(nested.join(".claw").join("CLAW.md"), "nested rules")
+        .expect("write apps dot saw instructions");
+        fs::write(nested.join(".saw").join("CLAW.md"), "nested rules")
             .expect("write nested rules");
         fs::write(
-            nested.join(".claw").join("instructions.md"),
+            nested.join(".saw").join("instructions.md"),
             "nested instructions",
         )
         .expect("write nested instructions");
@@ -561,7 +561,7 @@ mod tests {
                 "root instructions",
                 "local instructions",
                 "apps instructions",
-                "apps dot claw instructions",
+                "apps dot saw instructions",
                 "nested rules",
                 "nested instructions"
             ]
@@ -603,7 +603,7 @@ mod tests {
     #[test]
     fn displays_context_paths_compactly() {
         assert_eq!(
-            display_context_path(Path::new("/tmp/project/.claw/CLAW.md")),
+            display_context_path(Path::new("/tmp/project/.saw/CLAW.md")),
             "CLAW.md"
         );
     }
@@ -679,10 +679,10 @@ mod tests {
     #[test]
     fn load_system_prompt_reads_claw_files_and_config() {
         let root = temp_dir();
-        fs::create_dir_all(root.join(".claw")).expect("claw dir");
+        fs::create_dir_all(root.join(".saw")).expect("saw dir");
         fs::write(root.join("CLAW.md"), "Project rules").expect("write instructions");
         fs::write(
-            root.join(".claw").join("settings.json"),
+            root.join(".saw").join("settings.json"),
             r#"{"permissionMode":"acceptEdits"}"#,
         )
         .expect("write settings");
@@ -721,10 +721,10 @@ mod tests {
     #[test]
     fn renders_claw_code_style_sections_with_project_context() {
         let root = temp_dir();
-        fs::create_dir_all(root.join(".claw")).expect("claw dir");
+        fs::create_dir_all(root.join(".saw")).expect("saw dir");
         fs::write(root.join("CLAW.md"), "Project rules").expect("write CLAW.md");
         fs::write(
-            root.join(".claw").join("settings.json"),
+            root.join(".saw").join("settings.json"),
             r#"{"permissionMode":"acceptEdits"}"#,
         )
         .expect("write settings");
@@ -743,7 +743,7 @@ mod tests {
 
         assert!(prompt.contains("# System"));
         assert!(prompt.contains("# Project context"));
-        assert!(prompt.contains("# Claw instructions"));
+        assert!(prompt.contains("# Saw instructions"));
         assert!(prompt.contains("Project rules"));
         assert!(prompt.contains("permissionMode"));
         assert!(prompt.contains(SYSTEM_PROMPT_DYNAMIC_BOUNDARY));
@@ -763,9 +763,9 @@ mod tests {
     fn discovers_dot_claw_instructions_markdown() {
         let root = temp_dir();
         let nested = root.join("apps").join("api");
-        fs::create_dir_all(nested.join(".claw")).expect("nested claw dir");
+        fs::create_dir_all(nested.join(".saw")).expect("nested saw dir");
         fs::write(
-            nested.join(".claw").join("instructions.md"),
+            nested.join(".saw").join("instructions.md"),
             "instruction markdown",
         )
         .expect("write instructions.md");
@@ -774,7 +774,7 @@ mod tests {
         assert!(context
             .instruction_files
             .iter()
-            .any(|file| file.path.ends_with(".claw/instructions.md")));
+            .any(|file| file.path.ends_with(".saw/instructions.md")));
         assert!(
             render_instruction_files(&context.instruction_files).contains("instruction markdown")
         );
@@ -788,7 +788,7 @@ mod tests {
             path: PathBuf::from("/tmp/project/CLAW.md"),
             content: "Project rules".to_string(),
         }]);
-        assert!(rendered.contains("# Claw instructions"));
+        assert!(rendered.contains("# Saw instructions"));
         assert!(rendered.contains("scope: /tmp/project"));
         assert!(rendered.contains("Project rules"));
     }

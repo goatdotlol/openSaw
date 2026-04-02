@@ -330,9 +330,9 @@
     "responsibility": "Command module mirrored from archived TypeScript path commands/files/index.ts"
   },
   {
-    "name": "good-claw",
-    "source_hint": "commands/good-claw/index.js",
-    "responsibility": "Command module mirrored from archived TypeScript path commands/good-claw/index.js"
+    "name": "good-saw",
+    "source_hint": "commands/good-saw/index.js",
+    "responsibility": "Command module mirrored from archived TypeScript path commands/good-saw/index.js"
   },
   {
     "name": "heapdump",

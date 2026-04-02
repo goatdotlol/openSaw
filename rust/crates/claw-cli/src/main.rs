@@ -16,7 +16,7 @@ use std::thread;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use api::{
-    resolve_startup_auth_source, AuthSource, ClawApiClient, ContentBlockDelta, InputContentBlock,
+    resolve_startup_auth_source, AuthSource, SawApiClient, ContentBlockDelta, InputContentBlock,
     InputMessage, MessageRequest, MessageResponse, OutputContentBlock,
     StreamEvent as ApiStreamEvent, ToolChoice, ToolDefinition, ToolResultContentBlock,
 };
@@ -75,7 +75,7 @@ fn render_cli_error(problem: &str) -> String {
         };
         lines.push(format!("{label}{line}"));
     }
-    lines.push("  Help             claw --help".to_string());
+    lines.push("  Help             saw --help".to_string());
     lines.join("\n")
 }
 
@@ -223,7 +223,7 @@ fn parse_args(args: &[String]) -> Result<CliAction, String> {
                 index += 1;
             }
             "-p" => {
-                // Claw Code compat: -p "prompt" = one-shot prompt
+                // Open Saw compat: -p "prompt" = one-shot prompt
                 let prompt = args[index + 1..].join(" ");
                 if prompt.trim().is_empty() {
                     return Err("-p requires a prompt string".to_string());
@@ -237,7 +237,7 @@ fn parse_args(args: &[String]) -> Result<CliAction, String> {
                 });
             }
             "--print" => {
-                // Claw Code compat: --print makes output non-interactive
+                // Open Saw compat: --print makes output non-interactive
                 output_format = CliOutputFormat::Text;
                 index += 1;
             }
@@ -353,9 +353,9 @@ fn format_direct_slash_command_error(command: &str, is_unknown: bool) -> String 
     if is_unknown {
         append_slash_command_suggestions(&mut lines, trimmed);
     } else {
-        lines.push("  Try              Start `claw` to use interactive slash commands".to_string());
+        lines.push("  Try              Start `saw` to use interactive slash commands".to_string());
         lines.push(
-            "  Tip              Resume-safe commands also work with `claw --resume SESSION.json ...`"
+            "  Tip              Resume-safe commands also work with `saw --resume SESSION.json ...`"
                 .to_string(),
         );
     }
@@ -491,8 +491,8 @@ fn print_bootstrap_plan() {
 fn default_oauth_config() -> OAuthConfig {
     OAuthConfig {
         client_id: String::from("9d1c250a-e61b-44d9-88ed-5944d1962f5e"),
-        authorize_url: String::from("https://platform.claw.dev/oauth/authorize"),
-        token_url: String::from("https://platform.claw.dev/v1/oauth/token"),
+        authorize_url: String::from("https://platform.saw.dev/oauth/authorize"),
+        token_url: String::from("https://platform.saw.dev/v1/oauth/token"),
         callback_port: None,
         manual_redirect_url: None,
         scopes: vec![
@@ -516,7 +516,7 @@ fn run_login() -> Result<(), Box<dyn std::error::Error>> {
         OAuthAuthorizationRequest::from_config(oauth, redirect_uri.clone(), state.clone(), &pkce)
             .build_url();
 
-    println!("Starting Claw OAuth login...");
+    println!("Starting Saw OAuth login...");
     println!("Listening for callback on {redirect_uri}");
     if let Err(error) = open_browser(&authorize_url) {
         eprintln!("warning: failed to open browser automatically: {error}");
@@ -540,7 +540,7 @@ fn run_login() -> Result<(), Box<dyn std::error::Error>> {
         return Err(io::Error::new(io::ErrorKind::InvalidData, "oauth state mismatch").into());
     }
 
-    let client = ClawApiClient::from_auth(AuthSource::None).with_base_url(api::read_base_url());
+    let client = SawApiClient::from_auth(AuthSource::None).with_base_url(api::read_base_url());
     let exchange_request =
         OAuthTokenExchangeRequest::from_config(oauth, code, state, pkce.verifier, redirect_uri);
     let runtime = tokio::runtime::Runtime::new()?;
@@ -551,13 +551,13 @@ fn run_login() -> Result<(), Box<dyn std::error::Error>> {
         expires_at: token_set.expires_at,
         scopes: token_set.scopes,
     })?;
-    println!("Claw OAuth login complete.");
+    println!("Saw OAuth login complete.");
     Ok(())
 }
 
 fn run_logout() -> Result<(), Box<dyn std::error::Error>> {
     clear_oauth_credentials()?;
-    println!("Claw OAuth credentials cleared.");
+    println!("Saw OAuth credentials cleared.");
     Ok(())
 }
 
@@ -602,9 +602,9 @@ fn wait_for_oauth_callback(
     let callback = parse_oauth_callback_request_target(target)
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
     let body = if callback.error.is_some() {
-        "Claw OAuth login failed. You can close this window."
+        "Saw OAuth login failed. You can close this window."
     } else {
-        "Claw OAuth login succeeded. You can close this window."
+        "Saw OAuth login succeeded. You can close this window."
     };
     let response = format!(
         "HTTP/1.1 200 OK\r\ncontent-type: text/plain; charset=utf-8\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{}",
@@ -1123,9 +1123,9 @@ impl LiveCli {
             format!(
                 "{} {}",
                 if color {
-                    "\x1b[1;38;5;45m🦞 Claw Code\x1b[0m"
+                    "\x1b[1;38;5;46m🌲 Open Saw\x1b[0m"
                 } else {
-                    "Claw Code"
+                    "Open Saw"
                 },
                 if color {
                     "\x1b[2m· ready\x1b[0m"
@@ -1152,7 +1152,7 @@ impl LiveCli {
         ];
         if !has_claw_md {
             lines.push(
-                "  First run        /init scaffolds CLAW.md, .claw.json, and local session files"
+                "  First run        /init scaffolds CLAW.md, .saw.json, and local session files"
                     .to_string(),
             );
         }
@@ -1773,7 +1773,7 @@ impl LiveCli {
             return Err("generated commit message was empty".into());
         }
 
-        let path = write_temp_text_file("claw-commit-message.txt", &message)?;
+        let path = write_temp_text_file("saw-commit-message.txt", &message)?;
         let output = Command::new("git")
             .args(["commit", "--file"])
             .arg(&path)
@@ -1804,7 +1804,7 @@ impl LiveCli {
             .ok_or_else(|| "failed to parse generated PR title/body".to_string())?;
 
         if command_exists("gh") {
-            let body_path = write_temp_text_file("claw-pr-body.md", &body)?;
+            let body_path = write_temp_text_file("saw-pr-body.md", &body)?;
             let output = Command::new("gh")
                 .args(["pr", "create", "--title", &title, "--body-file"])
                 .arg(&body_path)
@@ -1835,7 +1835,7 @@ impl LiveCli {
             .ok_or_else(|| "failed to parse generated issue title/body".to_string())?;
 
         if command_exists("gh") {
-            let body_path = write_temp_text_file("claw-issue-body.md", &body)?;
+            let body_path = write_temp_text_file("saw-issue-body.md", &body)?;
             let output = Command::new("gh")
                 .args(["issue", "create", "--title", &title, "--body-file"])
                 .arg(&body_path)
@@ -1858,7 +1858,7 @@ impl LiveCli {
 
 fn sessions_dir() -> Result<PathBuf, Box<dyn std::error::Error>> {
     let cwd = env::current_dir()?;
-    let path = cwd.join(".claw").join("sessions");
+    let path = cwd.join(".saw").join("sessions");
     fs::create_dir_all(&path)?;
     Ok(path)
 }
@@ -2487,7 +2487,7 @@ fn render_version_report() -> String {
     let git_sha = GIT_SHA.unwrap_or("unknown");
     let target = BUILD_TARGET.unwrap_or("unknown");
     format!(
-        "Claw Code\n  Version          {VERSION}\n  Git SHA          {git_sha}\n  Target           {target}\n  Build date       {DEFAULT_DATE}\n\nSupport\n  Help             claw --help\n  REPL             /help"
+        "Open Saw\n  Version          {VERSION}\n  Git SHA          {git_sha}\n  Target           {target}\n  Build date       {DEFAULT_DATE}\n\nSupport\n  Help             saw --help\n  REPL             /help"
     )
 }
 
@@ -3040,7 +3040,7 @@ impl runtime::PermissionPrompter for CliPermissionPrompter {
 
 struct DefaultRuntimeClient {
     runtime: tokio::runtime::Runtime,
-    client: ClawApiClient,
+    client: SawApiClient,
     model: String,
     enable_tools: bool,
     emit_output: bool,
@@ -3060,7 +3060,7 @@ impl DefaultRuntimeClient {
     ) -> Result<Self, Box<dyn std::error::Error>> {
         Ok(Self {
             runtime: tokio::runtime::Runtime::new()?,
-            client: ClawApiClient::from_auth(resolve_cli_auth_source()?)
+            client: SawApiClient::from_auth(resolve_cli_auth_source()?)
                 .with_base_url(api::read_base_url()),
             model,
             enable_tools,
@@ -3957,7 +3957,7 @@ fn convert_messages(messages: &[ConversationMessage]) -> Vec<InputMessage> {
 }
 
 fn print_help_to(out: &mut impl Write) -> io::Result<()> {
-    writeln!(out, "Claw Code CLI v{VERSION}")?;
+    writeln!(out, "Open Saw CLI v{VERSION}")?;
     writeln!(
         out,
         "  Interactive coding assistant for the current workspace."
@@ -3966,19 +3966,19 @@ fn print_help_to(out: &mut impl Write) -> io::Result<()> {
     writeln!(out, "Quick start")?;
     writeln!(
         out,
-        "  claw                                  Start the interactive REPL"
+        "  saw                                  Start the interactive REPL"
     )?;
     writeln!(
         out,
-        "  claw \"summarize this repo\"            Run one prompt and exit"
+        "  saw \"summarize this repo\"            Run one prompt and exit"
     )?;
     writeln!(
         out,
-        "  claw prompt \"explain src/main.rs\"     Explicit one-shot prompt"
+        "  saw prompt \"explain src/main.rs\"     Explicit one-shot prompt"
     )?;
     writeln!(
         out,
-        "  claw --resume SESSION.json /status    Inspect a saved session"
+        "  saw --resume SESSION.json /status    Inspect a saved session"
     )?;
     writeln!(out)?;
     writeln!(out, "Interactive essentials")?;
@@ -4014,32 +4014,32 @@ fn print_help_to(out: &mut impl Write) -> io::Result<()> {
     writeln!(out, "Commands")?;
     writeln!(
         out,
-        "  claw dump-manifests                   Read upstream TS sources and print extracted counts"
+        "  saw dump-manifests                   Read upstream TS sources and print extracted counts"
     )?;
     writeln!(
         out,
-        "  claw bootstrap-plan                   Print the bootstrap phase skeleton"
+        "  saw bootstrap-plan                   Print the bootstrap phase skeleton"
     )?;
     writeln!(
         out,
-        "  claw agents                           List configured agents"
+        "  saw agents                           List configured agents"
     )?;
     writeln!(
         out,
-        "  claw skills                           List installed skills"
+        "  saw skills                           List installed skills"
     )?;
-    writeln!(out, "  claw system-prompt [--cwd PATH] [--date YYYY-MM-DD]")?;
+    writeln!(out, "  saw system-prompt [--cwd PATH] [--date YYYY-MM-DD]")?;
     writeln!(
         out,
-        "  claw login                            Start the OAuth login flow"
-    )?;
-    writeln!(
-        out,
-        "  claw logout                           Clear saved OAuth credentials"
+        "  saw login                            Start the OAuth login flow"
     )?;
     writeln!(
         out,
-        "  claw init                             Scaffold CLAW.md + local files"
+        "  saw logout                           Clear saved OAuth credentials"
+    )?;
+    writeln!(
+        out,
+        "  saw init                             Scaffold CLAW.md + local files"
     )?;
     writeln!(out)?;
     writeln!(out, "Flags")?;
@@ -4081,23 +4081,23 @@ fn print_help_to(out: &mut impl Write) -> io::Result<()> {
         .join(", ");
     writeln!(out, "Resume-safe commands: {resume_commands}")?;
     writeln!(out, "Examples")?;
-    writeln!(out, "  claw --model opus \"summarize this repo\"")?;
+    writeln!(out, "  saw --model opus \"summarize this repo\"")?;
     writeln!(
         out,
-        "  claw --output-format json prompt \"explain src/main.rs\""
+        "  saw --output-format json prompt \"explain src/main.rs\""
     )?;
     writeln!(
         out,
-        "  claw --allowedTools read,glob \"summarize Cargo.toml\""
+        "  saw --allowedTools read,glob \"summarize Cargo.toml\""
     )?;
     writeln!(
         out,
-        "  claw --resume session.json /status /diff /export notes.txt"
+        "  saw --resume session.json /status /diff /export notes.txt"
     )?;
-    writeln!(out, "  claw agents")?;
-    writeln!(out, "  claw /skills")?;
-    writeln!(out, "  claw login")?;
-    writeln!(out, "  claw init")?;
+    writeln!(out, "  saw agents")?;
+    writeln!(out, "  saw /skills")?;
+    writeln!(out, "  saw login")?;
+    writeln!(out, "  saw init")?;
     Ok(())
 }
 
@@ -4432,7 +4432,7 @@ mod tests {
         let help = commands::render_slash_command_help();
         assert!(help.contains("Slash commands"));
         assert!(help.contains("Tab completes commands inside the REPL."));
-        assert!(help.contains("available via claw --resume SESSION.json"));
+        assert!(help.contains("available via saw --resume SESSION.json"));
     }
 
     #[test]
@@ -4558,10 +4558,10 @@ mod tests {
         let mut help = Vec::new();
         print_help_to(&mut help).expect("help should render");
         let help = String::from_utf8(help).expect("help should be utf8");
-        assert!(help.contains("claw init"));
-        assert!(help.contains("claw agents"));
-        assert!(help.contains("claw skills"));
-        assert!(help.contains("claw /skills"));
+        assert!(help.contains("saw init"));
+        assert!(help.contains("saw agents"));
+        assert!(help.contains("saw skills"));
+        assert!(help.contains("saw /skills"));
     }
 
     #[test]
@@ -4875,7 +4875,7 @@ mod tests {
             task_label: "ship plugin progress".to_string(),
             step: 3,
             phase: "running read_file".to_string(),
-            detail: Some("reading rust/crates/claw-cli/src/main.rs".to_string()),
+            detail: Some("reading rust/crates/saw-cli/src/main.rs".to_string()),
             saw_final_text: false,
         };
 
@@ -4922,8 +4922,8 @@ mod tests {
             "reading src/main.rs"
         );
         assert!(
-            describe_tool_progress("bash", r#"{"command":"cargo test -p claw-cli"}"#)
-                .contains("cargo test -p claw-cli")
+            describe_tool_progress("bash", r#"{"command":"cargo test -p saw-cli"}"#)
+                .contains("cargo test -p saw-cli")
         );
         assert_eq!(
             describe_tool_progress("grep_search", r#"{"pattern":"ultraplan","path":"rust"}"#),

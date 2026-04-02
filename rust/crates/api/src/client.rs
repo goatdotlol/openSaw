@@ -1,5 +1,5 @@
 use crate::error::ApiError;
-use crate::providers::claw_provider::{self, AuthSource, ClawApiClient};
+use crate::providers::claw_provider::{self, AuthSource, SawApiClient};
 use crate::providers::openai_compat::{self, OpenAiCompatClient, OpenAiCompatConfig};
 use crate::providers::{self, Provider, ProviderKind};
 use crate::types::{MessageRequest, MessageResponse, StreamEvent};
@@ -20,7 +20,7 @@ async fn stream_via_provider<P: Provider>(
 
 #[derive(Debug, Clone)]
 pub enum ProviderClient {
-    ClawApi(ClawApiClient),
+    SawApi(SawApiClient),
     Xai(OpenAiCompatClient),
     OpenAi(OpenAiCompatClient),
 }
@@ -36,9 +36,9 @@ impl ProviderClient {
     ) -> Result<Self, ApiError> {
         let resolved_model = providers::resolve_model_alias(model);
         match providers::detect_provider_kind(&resolved_model) {
-            ProviderKind::ClawApi => Ok(Self::ClawApi(match default_auth {
-                Some(auth) => ClawApiClient::from_auth(auth),
-                None => ClawApiClient::from_env()?,
+            ProviderKind::SawApi => Ok(Self::SawApi(match default_auth {
+                Some(auth) => SawApiClient::from_auth(auth),
+                None => SawApiClient::from_env()?,
             })),
             ProviderKind::Xai => Ok(Self::Xai(OpenAiCompatClient::from_env(
                 OpenAiCompatConfig::xai(),
@@ -52,7 +52,7 @@ impl ProviderClient {
     #[must_use]
     pub const fn provider_kind(&self) -> ProviderKind {
         match self {
-            Self::ClawApi(_) => ProviderKind::ClawApi,
+            Self::SawApi(_) => ProviderKind::SawApi,
             Self::Xai(_) => ProviderKind::Xai,
             Self::OpenAi(_) => ProviderKind::OpenAi,
         }
@@ -63,7 +63,7 @@ impl ProviderClient {
         request: &MessageRequest,
     ) -> Result<MessageResponse, ApiError> {
         match self {
-            Self::ClawApi(client) => send_via_provider(client, request).await,
+            Self::SawApi(client) => send_via_provider(client, request).await,
             Self::Xai(client) | Self::OpenAi(client) => send_via_provider(client, request).await,
         }
     }
@@ -73,9 +73,9 @@ impl ProviderClient {
         request: &MessageRequest,
     ) -> Result<MessageStream, ApiError> {
         match self {
-            Self::ClawApi(client) => stream_via_provider(client, request)
+            Self::SawApi(client) => stream_via_provider(client, request)
                 .await
-                .map(MessageStream::ClawApi),
+                .map(MessageStream::SawApi),
             Self::Xai(client) | Self::OpenAi(client) => stream_via_provider(client, request)
                 .await
                 .map(MessageStream::OpenAiCompat),
@@ -85,7 +85,7 @@ impl ProviderClient {
 
 #[derive(Debug)]
 pub enum MessageStream {
-    ClawApi(claw_provider::MessageStream),
+    SawApi(claw_provider::MessageStream),
     OpenAiCompat(openai_compat::MessageStream),
 }
 
@@ -93,14 +93,14 @@ impl MessageStream {
     #[must_use]
     pub fn request_id(&self) -> Option<&str> {
         match self {
-            Self::ClawApi(stream) => stream.request_id(),
+            Self::SawApi(stream) => stream.request_id(),
             Self::OpenAiCompat(stream) => stream.request_id(),
         }
     }
 
     pub async fn next_event(&mut self) -> Result<Option<StreamEvent>, ApiError> {
         match self {
-            Self::ClawApi(stream) => stream.next_event().await,
+            Self::SawApi(stream) => stream.next_event().await,
             Self::OpenAiCompat(stream) => stream.next_event().await,
         }
     }
@@ -135,7 +135,7 @@ mod tests {
         assert_eq!(detect_provider_kind("grok-3"), ProviderKind::Xai);
         assert_eq!(
             detect_provider_kind("claude-sonnet-4-6"),
-            ProviderKind::ClawApi
+            ProviderKind::SawApi
         );
     }
 }

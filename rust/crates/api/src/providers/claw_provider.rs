@@ -44,7 +44,7 @@ impl AuthSource {
             (Some(api_key), None) => Ok(Self::ApiKey(api_key)),
             (None, Some(bearer_token)) => Ok(Self::BearerToken(bearer_token)),
             (None, None) => Err(ApiError::missing_credentials(
-                "Claw",
+                "Saw",
                 &["ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_API_KEY"],
             )),
         }
@@ -106,7 +106,7 @@ impl From<OAuthTokenSet> for AuthSource {
 }
 
 #[derive(Debug, Clone)]
-pub struct ClawApiClient {
+pub struct SawApiClient {
     http: reqwest::Client,
     auth: AuthSource,
     base_url: String,
@@ -115,7 +115,7 @@ pub struct ClawApiClient {
     max_backoff: Duration,
 }
 
-impl ClawApiClient {
+impl SawApiClient {
     #[must_use]
     pub fn new(api_key: impl Into<String>) -> Self {
         Self {
@@ -368,7 +368,7 @@ impl AuthSource {
             }
             Ok(Some(token_set)) => Ok(Self::BearerToken(token_set.access_token)),
             Ok(None) => Err(ApiError::missing_credentials(
-                "Claw",
+                "Saw",
                 &["ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_API_KEY"],
             )),
             Err(error) => Err(error),
@@ -415,7 +415,7 @@ where
 
     let Some(token_set) = load_saved_oauth_token()? else {
         return Err(ApiError::missing_credentials(
-            "Claw",
+            "Saw",
             &["ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_API_KEY"],
         ));
     };
@@ -446,7 +446,7 @@ fn resolve_saved_oauth_token_set(
     let Some(refresh_token) = token_set.refresh_token.clone() else {
         return Err(ApiError::ExpiredOAuthToken);
     };
-    let client = ClawApiClient::from_auth(AuthSource::None).with_base_url(read_base_url());
+    let client = SawApiClient::from_auth(AuthSource::None).with_base_url(read_base_url());
     let refreshed = client_runtime_block_on(async {
         client
             .refresh_oauth_token(
@@ -515,7 +515,7 @@ fn read_api_key() -> Result<String, ApiError> {
         .or_else(|| auth.bearer_token())
         .map(ToOwned::to_owned)
         .ok_or(ApiError::missing_credentials(
-            "Claw",
+            "Saw",
             &["ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_API_KEY"],
         ))
 }
@@ -540,7 +540,7 @@ fn request_id_from_headers(headers: &reqwest::header::HeaderMap) -> Option<Strin
         .map(ToOwned::to_owned)
 }
 
-impl Provider for ClawApiClient {
+impl Provider for SawApiClient {
     type Stream = MessageStream;
 
     fn send_message<'a>(
@@ -652,7 +652,7 @@ mod tests {
 
     use super::{
         now_unix_timestamp, oauth_token_is_expired, resolve_saved_oauth_token,
-        resolve_startup_auth_source, AuthSource, ClawApiClient, OAuthTokenSet,
+        resolve_startup_auth_source, AuthSource, SawApiClient, OAuthTokenSet,
     };
     use crate::types::{ContentBlockDelta, MessageRequest};
 
@@ -960,7 +960,7 @@ mod tests {
 
     #[test]
     fn backoff_doubles_until_maximum() {
-        let client = ClawApiClient::new("test-key").with_retry_policy(
+        let client = SawApiClient::new("test-key").with_retry_policy(
             3,
             Duration::from_millis(10),
             Duration::from_millis(25),

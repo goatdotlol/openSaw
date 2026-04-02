@@ -8,8 +8,8 @@ const STARTER_CLAW_JSON: &str = concat!(
     "  }\n",
     "}\n",
 );
-const GITIGNORE_COMMENT: &str = "# Claw Code local artifacts";
-const GITIGNORE_ENTRIES: [&str; 2] = [".claw/settings.local.json", ".claw/sessions/"];
+const GITIGNORE_COMMENT: &str = "# Open Saw local artifacts";
+const GITIGNORE_ENTRIES: [&str; 2] = [".saw/settings.local.json", ".saw/sessions/"];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum InitStatus {
@@ -80,15 +80,15 @@ struct RepoDetection {
 pub(crate) fn initialize_repo(cwd: &Path) -> Result<InitReport, Box<dyn std::error::Error>> {
     let mut artifacts = Vec::new();
 
-    let claw_dir = cwd.join(".claw");
+    let claw_dir = cwd.join(".saw");
     artifacts.push(InitArtifact {
-        name: ".claw/",
+        name: ".saw/",
         status: ensure_dir(&claw_dir)?,
     });
 
-    let claw_json = cwd.join(".claw.json");
+    let claw_json = cwd.join(".saw.json");
     artifacts.push(InitArtifact {
-        name: ".claw.json",
+        name: ".saw.json",
         status: write_file_if_missing(&claw_json, STARTER_CLAW_JSON)?,
     });
 
@@ -164,7 +164,7 @@ pub(crate) fn render_init_claw_md(cwd: &Path) -> String {
     let mut lines = vec![
         "# CLAW.md".to_string(),
         String::new(),
-        "This file provides guidance to Claw Code (clawcode.dev) when working with code in this repository.".to_string(),
+        "This file provides guidance to Open Saw (clawcode.dev) when working with code in this repository.".to_string(),
         String::new(),
     ];
 
@@ -209,7 +209,7 @@ pub(crate) fn render_init_claw_md(cwd: &Path) -> String {
 
     lines.push("## Working agreement".to_string());
     lines.push("- Prefer small, reviewable changes and keep generated bootstrap files aligned with actual repo workflows.".to_string());
-    lines.push("- Keep shared defaults in `.claw.json`; reserve `.claw/settings.local.json` for machine-local overrides.".to_string());
+    lines.push("- Keep shared defaults in `.saw.json`; reserve `.saw/settings.local.json` for machine-local overrides.".to_string());
     lines.push("- Do not overwrite existing `CLAW.md` content automatically; update it intentionally when repo workflows change.".to_string());
     lines.push(String::new());
 
@@ -343,7 +343,7 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .expect("time should be after epoch")
             .as_nanos();
-        std::env::temp_dir().join(format!("claw-init-{nanos}"))
+        std::env::temp_dir().join(format!("saw-init-{nanos}"))
     }
 
     #[test]
@@ -354,15 +354,15 @@ mod tests {
 
         let report = initialize_repo(&root).expect("init should succeed");
         let rendered = report.render();
-        assert!(rendered.contains(".claw/           created"));
-        assert!(rendered.contains(".claw.json       created"));
+        assert!(rendered.contains(".saw/           created"));
+        assert!(rendered.contains(".saw.json       created"));
         assert!(rendered.contains(".gitignore       created"));
         assert!(rendered.contains("CLAW.md          created"));
-        assert!(root.join(".claw").is_dir());
-        assert!(root.join(".claw.json").is_file());
+        assert!(root.join(".saw").is_dir());
+        assert!(root.join(".saw.json").is_file());
         assert!(root.join("CLAW.md").is_file());
         assert_eq!(
-            fs::read_to_string(root.join(".claw.json")).expect("read claw json"),
+            fs::read_to_string(root.join(".saw.json")).expect("read saw json"),
             concat!(
                 "{\n",
                 "  \"permissions\": {\n",
@@ -372,9 +372,9 @@ mod tests {
             )
         );
         let gitignore = fs::read_to_string(root.join(".gitignore")).expect("read gitignore");
-        assert!(gitignore.contains(".claw/settings.local.json"));
-        assert!(gitignore.contains(".claw/sessions/"));
-        let claw_md = fs::read_to_string(root.join("CLAW.md")).expect("read claw md");
+        assert!(gitignore.contains(".saw/settings.local.json"));
+        assert!(gitignore.contains(".saw/sessions/"));
+        let claw_md = fs::read_to_string(root.join("CLAW.md")).expect("read saw md");
         assert!(claw_md.contains("Languages: Rust."));
         assert!(claw_md.contains("cargo clippy --workspace --all-targets -- -D warnings"));
 
@@ -385,8 +385,8 @@ mod tests {
     fn initialize_repo_is_idempotent_and_preserves_existing_files() {
         let root = temp_dir();
         fs::create_dir_all(&root).expect("create root");
-        fs::write(root.join("CLAW.md"), "custom guidance\n").expect("write existing claw md");
-        fs::write(root.join(".gitignore"), ".claw/settings.local.json\n").expect("write gitignore");
+        fs::write(root.join("CLAW.md"), "custom guidance\n").expect("write existing saw md");
+        fs::write(root.join(".gitignore"), ".saw/settings.local.json\n").expect("write gitignore");
 
         let first = initialize_repo(&root).expect("first init should succeed");
         assert!(first
@@ -394,17 +394,17 @@ mod tests {
             .contains("CLAW.md          skipped (already exists)"));
         let second = initialize_repo(&root).expect("second init should succeed");
         let second_rendered = second.render();
-        assert!(second_rendered.contains(".claw/           skipped (already exists)"));
-        assert!(second_rendered.contains(".claw.json       skipped (already exists)"));
+        assert!(second_rendered.contains(".saw/           skipped (already exists)"));
+        assert!(second_rendered.contains(".saw.json       skipped (already exists)"));
         assert!(second_rendered.contains(".gitignore       skipped (already exists)"));
         assert!(second_rendered.contains("CLAW.md          skipped (already exists)"));
         assert_eq!(
-            fs::read_to_string(root.join("CLAW.md")).expect("read existing claw md"),
+            fs::read_to_string(root.join("CLAW.md")).expect("read existing saw md"),
             "custom guidance\n"
         );
         let gitignore = fs::read_to_string(root.join(".gitignore")).expect("read gitignore");
-        assert_eq!(gitignore.matches(".claw/settings.local.json").count(), 1);
-        assert_eq!(gitignore.matches(".claw/sessions/").count(), 1);
+        assert_eq!(gitignore.matches(".saw/settings.local.json").count(), 1);
+        assert_eq!(gitignore.matches(".saw/sessions/").count(), 1);
 
         fs::remove_dir_all(root).expect("cleanup temp dir");
     }

@@ -20,7 +20,7 @@ async fn send_message_posts_json_and_parses_response() {
         "\"id\":\"msg_test\",",
         "\"type\":\"message\",",
         "\"role\":\"assistant\",",
-        "\"content\":[{\"type\":\"text\",\"text\":\"Hello from Claw\"}],",
+        "\"content\":[{\"type\":\"text\",\"text\":\"Hello from Saw\"}],",
         "\"model\":\"claude-sonnet-4-6\",",
         "\"stop_reason\":\"end_turn\",",
         "\"stop_sequence\":null,",
@@ -48,7 +48,7 @@ async fn send_message_posts_json_and_parses_response() {
     assert_eq!(
         response.content,
         vec![OutputContentBlock::Text {
-            text: "Hello from Claw".to_string(),
+            text: "Hello from Saw".to_string(),
         }]
     );
 
@@ -214,8 +214,8 @@ async fn provider_client_dispatches_api_requests() {
     )
     .expect("api provider client should be constructed");
     let client = match client {
-        ProviderClient::ClawApi(client) => {
-            ProviderClient::ClawApi(client.with_base_url(server.base_url()))
+        ProviderClient::SawApi(client) => {
+            ProviderClient::SawApi(client.with_base_url(server.base_url()))
         }
         other => panic!("expected default provider, got {other:?}"),
     };

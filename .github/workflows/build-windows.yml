@@ -36,8 +36,8 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: claw-windows-exe
-        path: rust/target/release/claw.exe
+        name: saw-windows-exe
+        path: rust/target/release/saw.exe
         if-no-files-found: error
         
     - name: Create Release and Upload
@@ -45,8 +45,8 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         tag_name: "latest"
-        name: "Claw Code Latest Release"
-        files: rust/target/release/claw.exe
-        body: "Automated release build."
+        name: "Open Saw Latest Release"
+        files: rust/target/release/saw.exe
+        body: "Automated release build for Open Saw."
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

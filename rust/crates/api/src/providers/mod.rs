@@ -25,7 +25,7 @@ pub trait Provider {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProviderKind {
-    ClawApi,
+    SawApi,
     Xai,
     OpenAi,
 }
@@ -42,7 +42,7 @@ const MODEL_REGISTRY: &[(&str, ProviderMetadata)] = &[
     (
         "opus",
         ProviderMetadata {
-            provider: ProviderKind::ClawApi,
+            provider: ProviderKind::SawApi,
             auth_env: "ANTHROPIC_API_KEY",
             base_url_env: "ANTHROPIC_BASE_URL",
             default_base_url: claw_provider::DEFAULT_BASE_URL,
@@ -51,7 +51,7 @@ const MODEL_REGISTRY: &[(&str, ProviderMetadata)] = &[
     (
         "sonnet",
         ProviderMetadata {
-            provider: ProviderKind::ClawApi,
+            provider: ProviderKind::SawApi,
             auth_env: "ANTHROPIC_API_KEY",
             base_url_env: "ANTHROPIC_BASE_URL",
             default_base_url: claw_provider::DEFAULT_BASE_URL,
@@ -60,7 +60,7 @@ const MODEL_REGISTRY: &[(&str, ProviderMetadata)] = &[
     (
         "haiku",
         ProviderMetadata {
-            provider: ProviderKind::ClawApi,
+            provider: ProviderKind::SawApi,
             auth_env: "ANTHROPIC_API_KEY",
             base_url_env: "ANTHROPIC_BASE_URL",
             default_base_url: claw_provider::DEFAULT_BASE_URL,
@@ -69,7 +69,7 @@ const MODEL_REGISTRY: &[(&str, ProviderMetadata)] = &[
     (
         "claude-opus-4-6",
         ProviderMetadata {
-            provider: ProviderKind::ClawApi,
+            provider: ProviderKind::SawApi,
             auth_env: "ANTHROPIC_API_KEY",
             base_url_env: "ANTHROPIC_BASE_URL",
             default_base_url: claw_provider::DEFAULT_BASE_URL,
@@ -78,7 +78,7 @@ const MODEL_REGISTRY: &[(&str, ProviderMetadata)] = &[
     (
         "claude-sonnet-4-6",
         ProviderMetadata {
-            provider: ProviderKind::ClawApi,
+            provider: ProviderKind::SawApi,
             auth_env: "ANTHROPIC_API_KEY",
             base_url_env: "ANTHROPIC_BASE_URL",
             default_base_url: claw_provider::DEFAULT_BASE_URL,
@@ -87,7 +87,7 @@ const MODEL_REGISTRY: &[(&str, ProviderMetadata)] = &[
     (
         "claude-haiku-4-5-20251213",
         ProviderMetadata {
-            provider: ProviderKind::ClawApi,
+            provider: ProviderKind::SawApi,
             auth_env: "ANTHROPIC_API_KEY",
             base_url_env: "ANTHROPIC_BASE_URL",
             default_base_url: claw_provider::DEFAULT_BASE_URL,
@@ -148,7 +148,7 @@ pub fn resolve_model_alias(model: &str) -> String {
         .iter()
         .find_map(|(alias, metadata)| {
             (*alias == lower).then_some(match metadata.provider {
-                ProviderKind::ClawApi => match *alias {
+                ProviderKind::SawApi => match *alias {
                     "opus" => "claude-opus-4-6",
                     "sonnet" => "claude-sonnet-4-6",
                     "haiku" => "claude-haiku-4-5-20251213",
@@ -190,7 +190,7 @@ pub fn detect_provider_kind(model: &str) -> ProviderKind {
         return metadata.provider;
     }
     if claw_provider::has_auth_from_env_or_saved().unwrap_or(false) {
-        return ProviderKind::ClawApi;
+        return ProviderKind::SawApi;
     }
     if openai_compat::has_api_key("OPENAI_API_KEY") {
         return ProviderKind::OpenAi;
@@ -198,7 +198,7 @@ pub fn detect_provider_kind(model: &str) -> ProviderKind {
     if openai_compat::has_api_key("XAI_API_KEY") {
         return ProviderKind::Xai;
     }
-    ProviderKind::ClawApi
+    ProviderKind::SawApi
 }
 
 #[must_use]
@@ -227,7 +227,7 @@ mod tests {
         assert_eq!(detect_provider_kind("grok"), ProviderKind::Xai);
         assert_eq!(
             detect_provider_kind("claude-sonnet-4-6"),
-            ProviderKind::ClawApi
+            ProviderKind::SawApi
         );
     }
 

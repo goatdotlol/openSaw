@@ -1,12 +1,12 @@
 [package]
-name = "claw-cli"
+name = "saw-cli"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 publish.workspace = true
 
 [[bin]]
-name = "claw"
+name = "saw"
 path = "src/main.rs"
 
 [dependencies]

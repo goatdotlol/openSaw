@@ -29,16 +29,16 @@ pub struct ColorTheme {
 impl Default for ColorTheme {
     fn default() -> Self {
         Self {
-            heading: Color::Cyan,
-            emphasis: Color::Magenta,
+            heading: Color::Green,
+            emphasis: Color::DarkGreen,
             strong: Color::Yellow,
-            inline_code: Color::Green,
-            link: Color::Blue,
+            inline_code: Color::DarkGreen,
+            link: Color::Green,
             quote: Color::DarkGrey,
-            table_border: Color::DarkCyan,
+            table_border: Color::DarkGreen,
             code_block_border: Color::DarkGrey,
-            spinner_active: Color::Blue,
-            spinner_done: Color::Green,
+            spinner_active: Color::Green,
+            spinner_done: Color::DarkGreen,
             spinner_failed: Color::Red,
         }
     }
@@ -182,7 +182,7 @@ impl RenderState {
             style = match level {
                 1 => style.with(theme.heading),
                 2 => style.white(),
-                3 => style.with(Color::Blue),
+                3 => style.with(Color::Green),
                 _ => style.with(Color::Grey),
             };
         } else if self.strong > 0 {
@@ -711,10 +711,10 @@ mod tests {
     fn renders_links_as_colored_markdown_labels() {
         let terminal_renderer = TerminalRenderer::new();
         let markdown_output =
-            terminal_renderer.render_markdown("See [Claw](https://example.com/docs) now.");
+            terminal_renderer.render_markdown("See [Saw](https://example.com/docs) now.");
         let plain_text = strip_ansi(&markdown_output);
 
-        assert!(plain_text.contains("[Claw](https://example.com/docs)"));
+        assert!(plain_text.contains("[Saw](https://example.com/docs)"));
         assert!(markdown_output.contains('\u{1b}'));
     }
 
