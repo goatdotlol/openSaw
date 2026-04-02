@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="icon.png" width="100" alt="Open Saw Icon" />
+<img src="icon%20refined.png" width="100" alt="Open Saw Icon" />
 
 # OPEN SAW 
 
