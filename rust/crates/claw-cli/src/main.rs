@@ -1127,41 +1127,70 @@ impl LiveCli {
             if color { "\x1b[1;32m[ Authenticated ]\x1b[0m" } else { "[ Authenticated ]" }
         };
 
-        let border_color = if color { "\x1b[1;38;5;46m" } else { "" };
+        let border_color = if color { "\x1b[38;5;28m" } else { "" };
         let reset = if color { "\x1b[0m" } else { "" };
         let title_color = if color { "\x1b[1;38;5;46m" } else { "" };
         let dim = if color { "\x1b[2m" } else { "" };
         let bold = if color { "\x1b[1m" } else { "" };
         
-        let mut lines = vec![
-            format!("{border_color}╭──{reset} {title_color}🌲 Open Saw{reset} {dim}· ready{reset} {border_color}────────────────────────────────────────────{reset}"),
-            format!("{border_color}│{reset}"),
-            format!("{border_color}│{reset}{bold}  Workspace{reset}        {workspace_summary}"),
-            format!("{border_color}│{reset}{bold}  Directory{reset}        {cwd_display}"),
-            format!("{border_color}│{reset}{bold}  Model{reset}            {}", self.model),
-            format!("{border_color}│{reset}{bold}  Permissions{reset}      {}", self.permission_mode.as_str()),
-            format!("{border_color}│{reset}{bold}  Auth Status{reset}      {auth_status}"),
-            format!("{border_color}│{reset}{bold}  Session{reset}          {}", self.session.id),
-            format!("{border_color}│{reset}"),
-            format!(
-                "{border_color}│{reset}{bold}  Quick start{reset}      {}",
-                if has_claw_md {
-                    "/help · /status · ask for a task"
-                } else {
-                    "/init · /help · /status"
-                }
-            ),
-            format!("{border_color}│{reset}{bold}  Editor{reset}           Tab completes slash commands · /vim toggles modal editing"),
-            format!("{border_color}│{reset}{bold}  Multiline{reset}        Shift+Enter or Ctrl+J inserts a newline"),
+        let ascii_art = [
+            "   ██████╗ ██████╗  ███████╗███╗   ██╗",
+            "  ██╔═══██╗██╔══██╗ ██╔════╝████╗  ██║",
+            "  ██║   ██║██████╔╝ █████╗  ██╔██╗ ██║",
+            "  ██║   ██║██╔═══╝  ██╔══╝  ██║╚██╗██║",
+            "  ╚██████╔╝██║      ███████╗██║ ╚████║",
+            "   ╚═════╝ ╚═╝      ╚══════╝╚═╝  ╚═══╝",
+            "     ███████╗ █████╗ ██╗    ██╗       ",
+            "     ██╔════╝██╔══██╗██║    ██║       ",
+            "     ███████╗███████║██║ █╗ ██║       ",
+            "     ╚════██║██╔══██║██║███╗██║       ",
+            "     ███████║██║  ██║╚███╔███╔╝       ",
+            "     ╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝        "
         ];
         
-        if !has_claw_md {
-            lines.push(
-                format!("{border_color}│{reset}{bold}  First run{reset}        /init scaffolds CLAW.md, .saw.json, and local session files")
-            );
+        let mut lines = Vec::new();
+        
+        // Output gradient ASCII Art
+        let gradient_colors = ["46", "40", "34", "28"];
+        for (i, line) in ascii_art.iter().enumerate() {
+            let color_code = gradient_colors[i / 3];
+            if color {
+                lines.push(format!("\x1b[1;38;5;{}m{}\x1b[0m", color_code, line));
+            } else {
+                lines.push(line.to_string());
+            }
         }
         
-        lines.push(format!("{border_color}╰──────────────────────────────────────────────────────────────────{reset}"));
+        lines.push(String::new());
+        
+        lines.push(format!("{border_color}╭──{reset} {title_color}Open Saw{reset} {dim}· ready{reset} {border_color}────────────────────────────────────────────{reset}"));
+        lines.push(format!("{border_color}│{reset}"));
+        lines.push(format!("{border_color}│{reset}{bold}  Workspace{reset}   {workspace_summary}"));
+        lines.push(format!("{border_color}│{reset}{bold}  Directory{reset}   {cwd_display}"));
+        lines.push(format!("{border_color}│{reset}{bold}  Model{reset}       {}", self.model));
+        lines.push(format!("{border_color}│{reset}{bold}  Permissions{reset} {}", self.permission_mode.as_str()));
+        lines.push(format!("{border_color}│{reset}{bold}  Auth Status{reset} {auth_status}"));
+        lines.push(format!("{border_color}│{reset}{bold}  Session{reset}     {}", self.session.id));
+        lines.push(format!("{border_color}│{reset}"));
+        
+        if is_auth_missing {
+            lines.push(format!("{border_color}│{reset}{bold}  Getting Started{reset}"));
+            lines.push(format!("{border_color}│{reset}   1. Type \x1b[1;36m/login\x1b[0m to authenticate via Anthropic API."));
+            lines.push(format!("{border_color}│{reset}   2. Type \x1b[1;36m/help\x1b[0m to explore the CLI syntax."));
+            lines.push(format!("{border_color}│{reset}"));
+        } else {
+            lines.push(format!(
+                "{border_color}│{reset}{bold}  Quick start{reset} {}",
+                if has_claw_md { "/help · /status · ask for a task" } else { "/init · /help · /status" }
+            ));
+            lines.push(format!("{border_color}│{reset}{bold}  Editor{reset}      Tab completes commands · /vim toggles modal"));
+            
+            if !has_claw_md {
+                lines.push(format!("{border_color}│{reset}{bold}  First run{reset}   /init scaffolds CLAW.md and config files"));
+            }
+        }
+        
+        lines.push(format!("{border_color}╰──────────────────────────────────────────────────────────────{reset}"));
         lines.join("\n")
     }
 

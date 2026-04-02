@@ -29,17 +29,17 @@ pub struct ColorTheme {
 impl Default for ColorTheme {
     fn default() -> Self {
         Self {
-            heading: Color::Green,
-            emphasis: Color::DarkGreen,
-            strong: Color::Yellow,
-            inline_code: Color::DarkGreen,
-            link: Color::Green,
-            quote: Color::DarkGrey,
-            table_border: Color::DarkGreen,
-            code_block_border: Color::DarkGrey,
-            spinner_active: Color::Green,
-            spinner_done: Color::DarkGreen,
-            spinner_failed: Color::Red,
+            heading: Color::AnsiValue(46),        // Neon green
+            emphasis: Color::AnsiValue(40),       // Bright green
+            strong: Color::AnsiValue(34),         // Bold green
+            inline_code: Color::AnsiValue(28),    // Dark green
+            link: Color::AnsiValue(46),           // Neon green
+            quote: Color::AnsiValue(22),          // Deepest green
+            table_border: Color::AnsiValue(28),   // Dark green
+            code_block_border: Color::AnsiValue(28), // Dark green
+            spinner_active: Color::AnsiValue(46), // Neon green
+            spinner_done: Color::AnsiValue(40),   // Bright green
+            spinner_failed: Color::Red,           // Keep red for critical errors
         }
     }
 }
