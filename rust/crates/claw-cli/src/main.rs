@@ -1130,167 +1130,109 @@ fn print_startup_banner(cli: &LiveCli) {
 
     let mut out = io::stdout();
 
-    // Green gradient colors for the ASCII art
-    let g1 = Color::AnsiValue(46);  // brightest green
-    let g2 = Color::AnsiValue(40);
-    let g3 = Color::AnsiValue(34);
-    let g4 = Color::AnsiValue(28);  // darkest green
-    let border = Color::AnsiValue(28);
-    let label_color = Color::AnsiValue(40);
-    let value_color = Color::White;
-
-    // --- ASCII art "OPEN SAW" ---
-    let ascii_lines: &[(&str, Color)] = &[
-        ("   ██████╗ ██████╗  ███████╗███╗   ██╗", g1),
-        ("  ██╔═══██╗██╔══██╗ ██╔════╝████╗  ██║", g1),
-        ("  ██║   ██║██████╔╝ █████╗  ██╔██╗ ██║", g1),
-        ("  ██║   ██║██╔═══╝  ██╔══╝  ██║╚██╗██║", g2),
-        ("  ╚██████╔╝██║      ███████╗██║ ╚████║", g2),
-        ("   ╚═════╝ ╚═╝      ╚══════╝╚═╝  ╚═══╝", g2),
-        ("     ███████╗ █████╗ ██╗    ██╗", g3),
-        ("     ██╔════╝██╔══██╗██║    ██║", g3),
-        ("     ███████╗███████║██║ █╗ ██║", g3),
-        ("     ╚════██║██╔══██║██║███╗██║", g4),
-        ("     ███████║██║  ██║╚███╔███╔╝", g4),
-        ("     ╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝", g4),
-    ];
-
-    for (line, color) in ascii_lines {
-        let _ = execute!(out,
-            SetAttribute(Attribute::Bold),
-            SetForegroundColor(*color),
-            Print(line),
-            ResetColor,
-            Print("\n")
-        );
-    }
+    let border = Color::AnsiValue(28); // Dark Forest Green
+    let label = Color::AnsiValue(40);  // Mid Green
+    let value = Color::AnsiValue(46);  // Neon Green
+    let muted = Color::DarkGrey;
 
     println!();
-
+    
     // --- Top border ---
     let _ = execute!(out,
-        SetForegroundColor(border), Print("  ╭─"),
-        SetForegroundColor(g1), SetAttribute(Attribute::Bold), Print(" Open Saw "),
-        ResetColor,
-        SetForegroundColor(Color::DarkGrey), Print("· ready "),
-        SetForegroundColor(border), Print("──────────────────────────────────────╮"),
+        SetForegroundColor(border), Print(" ╭─ "),
+        SetForegroundColor(value), SetAttribute(Attribute::Bold), Print("Open Saw "),
+        ResetColor, SetForegroundColor(muted), Print("v0.1.0 "),
+        SetForegroundColor(border), Print("──"),
+        Print("───────────────────────────────────────╮"),
         ResetColor, Print("\n")
     );
 
     // --- Info rows ---
-    let _ = execute!(out, SetForegroundColor(border), Print("  │"), ResetColor, Print("\n"));
+    let _ = execute!(out, SetForegroundColor(border), Print(" │ "), ResetColor, Print("\n"));
     
     // Workspace
     let _ = execute!(out,
-        SetForegroundColor(border), Print("  │  "),
-        SetForegroundColor(label_color), SetAttribute(Attribute::Bold), Print("Workspace     "),
-        ResetColor, SetForegroundColor(value_color), Print(&workspace_summary),
+        SetForegroundColor(border), Print(" │ "),
+        SetForegroundColor(label), Print(" Workspace   "),
+        ResetColor, SetForegroundColor(value), Print(&workspace_summary),
         ResetColor, Print("\n")
     );
     // Directory
     let _ = execute!(out,
-        SetForegroundColor(border), Print("  │  "),
-        SetForegroundColor(label_color), SetAttribute(Attribute::Bold), Print("Directory     "),
-        ResetColor, SetForegroundColor(value_color), Print(&cwd_display),
+        SetForegroundColor(border), Print(" │ "),
+        SetForegroundColor(label), Print(" Directory   "),
+        ResetColor, SetForegroundColor(value), Print(&cwd_display),
         ResetColor, Print("\n")
     );
     // Model
     let _ = execute!(out,
-        SetForegroundColor(border), Print("  │  "),
-        SetForegroundColor(label_color), SetAttribute(Attribute::Bold), Print("Model         "),
-        ResetColor, SetForegroundColor(value_color), Print(&cli.model),
-        ResetColor, Print("\n")
-    );
-    // Permissions
-    let _ = execute!(out,
-        SetForegroundColor(border), Print("  │  "),
-        SetForegroundColor(label_color), SetAttribute(Attribute::Bold), Print("Permissions   "),
-        ResetColor, SetForegroundColor(value_color), Print(cli.permission_mode.as_str()),
+        SetForegroundColor(border), Print(" │ "),
+        SetForegroundColor(label), Print(" Model       "),
+        ResetColor, SetForegroundColor(value), Print(&cli.model),
         ResetColor, Print("\n")
     );
     // Auth Status
-    let _ = execute!(out, SetForegroundColor(border), Print("  │  "),
-        SetForegroundColor(label_color), SetAttribute(Attribute::Bold), Print("Auth          "),
+    let _ = execute!(out, SetForegroundColor(border), Print(" │ "),
+        SetForegroundColor(label), Print(" Auth        "),
         ResetColor
     );
     if is_auth_missing {
         let _ = execute!(out,
             SetForegroundColor(Color::Red), SetAttribute(Attribute::Bold),
-            Print("✘ Not Configured"),
+            Print("✘ API Key Missing"),
             ResetColor, Print("\n")
         );
     } else {
         let _ = execute!(out,
             SetForegroundColor(Color::AnsiValue(46)), SetAttribute(Attribute::Bold),
-            Print("✔ Ready"),
+            Print("✔ Authenticated"),
             ResetColor, Print("\n")
         );
     }
-    // Session
-    let _ = execute!(out,
-        SetForegroundColor(border), Print("  │  "),
-        SetForegroundColor(label_color), SetAttribute(Attribute::Bold), Print("Session       "),
-        ResetColor, SetForegroundColor(Color::DarkGrey), Print(&cli.session.id),
-        ResetColor, Print("\n")
-    );
 
     // --- Divider ---
-    let _ = execute!(out, SetForegroundColor(border), Print("  │"), ResetColor, Print("\n"));
+    let _ = execute!(out, SetForegroundColor(border), Print(" │ "), ResetColor, Print("\n"));
 
-    // --- Bottom section: Getting started or Quick start ---
+    // --- Getting started instructions ---
     if is_auth_missing {
         let _ = execute!(out,
-            SetForegroundColor(border), Print("  │  "),
-            SetForegroundColor(g1), SetAttribute(Attribute::Bold),
-            Print("Getting Started"),
+            SetForegroundColor(border), Print(" │ "),
+            SetForegroundColor(Color::Cyan), SetAttribute(Attribute::Bold), Print(" > "),
+            ResetColor, Print("Type "),
+            SetForegroundColor(Color::AnsiValue(46)), SetAttribute(Attribute::Bold), Print("[ /login ]"),
+            ResetColor, Print(" to add your API credentials"),
             ResetColor, Print("\n")
         );
         let _ = execute!(out,
-            SetForegroundColor(border), Print("  │   "),
-            ResetColor,
-            Print("Set "),
-            SetForegroundColor(Color::Cyan), Print("ANTHROPIC_API_KEY"),
-            ResetColor, Print(" env var, or type "),
-            SetForegroundColor(Color::Cyan), SetAttribute(Attribute::Bold), Print("/login"),
-            ResetColor, Print("\n")
-        );
-        let _ = execute!(out,
-            SetForegroundColor(border), Print("  │   "),
-            ResetColor,
-            Print("Type "),
-            SetForegroundColor(Color::Cyan), SetAttribute(Attribute::Bold), Print("/help"),
-            ResetColor, Print(" to explore all commands"),
+            SetForegroundColor(border), Print(" │ "),
+            SetForegroundColor(Color::Cyan), SetAttribute(Attribute::Bold), Print(" > "),
+            ResetColor, Print("Type "),
+            SetForegroundColor(Color::AnsiValue(46)), SetAttribute(Attribute::Bold), Print("[ /help ]"),
+            ResetColor, Print("  to explore commands"),
             ResetColor, Print("\n")
         );
     } else {
-        let qs = if has_claw_md { "/help · /status · ask a task" } else { "/init · /help · /status" };
         let _ = execute!(out,
-            SetForegroundColor(border), Print("  │  "),
-            SetForegroundColor(label_color), SetAttribute(Attribute::Bold), Print("Quick start   "),
-            ResetColor, SetForegroundColor(value_color), Print(qs),
+            SetForegroundColor(border), Print(" │ "),
+            SetForegroundColor(Color::Cyan), SetAttribute(Attribute::Bold), Print(" > "),
+            ResetColor, Print("Type a prompt to ask for a task"),
             ResetColor, Print("\n")
         );
         let _ = execute!(out,
-            SetForegroundColor(border), Print("  │  "),
-            SetForegroundColor(label_color), SetAttribute(Attribute::Bold), Print("Editor        "),
-            ResetColor, SetForegroundColor(value_color), Print("Tab completes · /vim toggles modal"),
+            SetForegroundColor(border), Print(" │ "),
+            SetForegroundColor(Color::Cyan), SetAttribute(Attribute::Bold), Print(" > "),
+            ResetColor, Print("Type "),
+            SetForegroundColor(Color::AnsiValue(46)), SetAttribute(Attribute::Bold), Print("[ /help ]"),
+            ResetColor, Print(" to explore commands"),
             ResetColor, Print("\n")
         );
-        if !has_claw_md {
-            let _ = execute!(out,
-                SetForegroundColor(border), Print("  │  "),
-                SetForegroundColor(label_color), SetAttribute(Attribute::Bold), Print("First run     "),
-                ResetColor, SetForegroundColor(value_color), Print("/init scaffolds CLAW.md & config"),
-                ResetColor, Print("\n")
-            );
-        }
     }
 
     // --- Bottom border ---
-    let _ = execute!(out, SetForegroundColor(border), Print("  │"), ResetColor, Print("\n"));
+    let _ = execute!(out, SetForegroundColor(border), Print(" │ "), ResetColor, Print("\n"));
     let _ = execute!(out,
         SetForegroundColor(border),
-        Print("  ╰──────────────────────────────────────────────────────────╯"),
+        Print(" ╰───────────────────────────────────────────────────────────╯"),
         ResetColor, Print("\n")
     );
 
